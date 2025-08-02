@@ -23,4 +23,4 @@ jobs:
           docker rm wizard-app || true
 
       - name: Run new container
-        run: docker run -d --restart unless-stopped --name wizard-app -p 5174:5174 -e wizard-app
+        run: docker run -d --restart unless-stopped --name wizard-app -p 5174:5174 wizard-app
