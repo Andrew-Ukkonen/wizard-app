@@ -1,0 +1,26 @@
+name: Deploy to Unraid
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t wizard-app:latest .
+
+      - name: Stop and remove old container
+        run: |
+          docker stop wizard-app || true
+          docker rm wizard-app || true
+
+      - name: Run new container
+        run: docker run -d --restart unless-stopped --name wizard-app -p 5175:5175 -e wizard-app
