@@ -9,8 +9,9 @@ jobs:
   deploy:
     runs-on: self-hosted
     environment: production
+    
     env:
-      VITE_API_URL: ${{ secrets.MY_API_URL }}
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
     steps:
       - name: Checkout code
