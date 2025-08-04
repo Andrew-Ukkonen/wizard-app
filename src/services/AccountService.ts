@@ -29,6 +29,7 @@ class AccountService {
 
     async login(login: string, password: string): Promise<NetworkResponse<User>> {
         try {
+            console.log(API_BASE_URL);
             const response: AxiosResponse<LoginResponse> =
                 await axios.post(`${API_BASE_URL}/auth/login`, {
                     login,
