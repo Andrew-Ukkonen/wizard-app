@@ -41,7 +41,7 @@ export default function Hero() {
             width: { sm: '100%', md: '80%' },
           }}
         >
-          Join over 1,000 players and create a spellbook from over 100 spells!
+          Join over 1 player(s) and create a spellbook from over 100 spells!
           Battle and level up against other players and enjoy the story with
           over 300 missions. After joining one of the many specializations, you can
           study and alter your spell line-up and earn rewards. The game is free to play,
