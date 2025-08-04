@@ -13,6 +13,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 const schema = z.object({
     email: z.email(),
@@ -34,21 +35,37 @@ type FormFields = z.infer<typeof schema>;
 export default function SignUp() {
     const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm<FormFields>({ resolver: zodResolver(schema) });
     const [showPassword, setShowPassword] = useState(false);
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5185'; // Fallback to local URL if not set
+    const mutation = useMutation({
+        mutationFn: async (data: FormFields) =>
+            fetch(`${API_BASE_URL}/account/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            }).then(res => res.json())
+    });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
-            let response = await AccountService.register(data.email, data.username, data.password);
+            const response = await mutation.mutateAsync(data);
             if (!response) {
                 setError("root", { message: "Something went wrong. Please try again later." });
                 return;
             }
 
             if (!response.success) {
-                setError("root", { message: response.error || "Registration failed" });
+                if (response.error) {
+                    for (const error of response.error) {
+                        let errorLocation = error.error !== 'exception' ? error.error : 'root';
+                        setError(errorLocation, { message: error.message });
+                    }
+                    return;
+                }
+
+                setError('root', { message: "Registration failed" });
                 return;
             }
 
-            // Handle successful registration, e.g., redirect or show a success message
             console.log('Registration successful:', response);
         } catch (error) {
             console.error(error);

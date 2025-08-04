@@ -1,5 +1,11 @@
 export type NetworkResponse<T> = {
     success: boolean;
     data?: T;
-    error?: string;
+    message?: string;
+    error?: ErrorMessage[];
 }
+
+export type ErrorMessage = {
+    error: string;
+    message: string;
+};
