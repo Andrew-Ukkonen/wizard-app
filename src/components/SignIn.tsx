@@ -35,6 +35,7 @@ export default function SignIn() {
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
+            console.log(import.meta.env.VITE_API_URL);
             const response: NetworkResponse<LoginResponse> = await mutation.mutateAsync(data);
             if (response.success && response.data) {
                 login(response.data);
