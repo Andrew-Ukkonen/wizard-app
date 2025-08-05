@@ -1,15 +1,18 @@
-import { User } from "../User";
 import { NetworkResponse } from "./NetworkResponse";
 
 type LoginResponse = {
-    accessToken: string;
-    refreshToken: string;
-    userWrapper: NetworkResponse<User>;
+    tokens: TokenResponse;
+    userWrapper: NetworkResponse<LoginDto>;
 };
 
-type Account = {
+type TokenResponse = {
+    accessToken: string;
+    refreshToken: string;
+}
+
+type LoginDto = {
     id: number;
     username: string;
 }
 
-export type { LoginResponse, Account };
+export type { LoginResponse, LoginDto, TokenResponse };

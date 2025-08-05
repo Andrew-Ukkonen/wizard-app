@@ -3,13 +3,13 @@ import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import AppAppBar from '../components/AppAppBar'
 import Footer from '../components/Footer'
-import { UserProvider } from '../contexts/UserContext'
 import AppTheme from '../shared-theme/AppTheme'
+import AuthProvider from '../contexts/AuthContext'
 
 export const Route = createRootRoute({
     component: () => (
         <>
-            <UserProvider>
+            <AuthProvider>
                 <AppTheme>
                     <CssBaseline enableColorScheme />
                     <Box
@@ -45,7 +45,7 @@ export const Route = createRootRoute({
                         </div>
                     </Box>
                 </AppTheme>
-            </UserProvider>
+            </AuthProvider>
         </>
     ),
 })

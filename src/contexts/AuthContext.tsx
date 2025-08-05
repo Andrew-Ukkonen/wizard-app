@@ -1,16 +1,12 @@
 import { useNavigate } from "@tanstack/react-router";
 import { createContext, useState, useContext, useEffect } from "react";
+import { LoginResponse } from "../types/data/LoginResponse";
 
-type LoginType = {
-    email: string;
-    password: string;
-    remember_me?: boolean | undefined;
-}
 
 interface ProviderProps {
     user: string | null,
     accessToken: string | null,
-    login(data: LoginType): void,
+    login(data: LoginResponse): void,
     logout(): void,
     setAccessToken(token: string | null): void;
 }
@@ -55,13 +51,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         tryRefresh();
     }, []);
 
-    const login = (data: LoginType) => {
-        const t = randomAlphaNumeric(50)
+    const login = (data: LoginResponse) => {
         setTimeout(() => {
-            const obj = { ...data, token: t }
-            setUser(data.email)
-            setAccessToken(t)
-            localStorage.setItem('user', JSON.stringify(obj))
+            setUser(data.userWrapper.data!.username)
+            setAccessToken(data.tokens.accessToken)
+            localStorage.setItem('user', JSON.stringify(data.userWrapper.data))
             navigate({ to: '/spellbook' })
         }, 1000);
     }

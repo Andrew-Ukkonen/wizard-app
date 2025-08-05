@@ -5,11 +5,14 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import visuallyHidden from '@mui/utils/visuallyHidden';
 import React, { useState } from 'react';
-import AccountService from '../services/AccountService'; // Adjust the import based on your service location
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useUser } from '../contexts/UserContext';
+import { useMutation } from '@tanstack/react-query';
+import { LoginResponse } from '../types/data/LoginResponse';
+import { NetworkResponse } from '../types/data/NetworkResponse';
+import { useAuth } from '../contexts/AuthContext';
+import { authEndpoints } from '../utils/endpoints';
 
 
 type FormFields = {
@@ -20,15 +23,23 @@ type FormFields = {
 export default function SignIn() {
     const { register, handleSubmit, formState: { isSubmitting } } = useForm<FormFields>();
     const [showPassword, setShowPassword] = useState(false);
-    const { login } = useUser();
+    const { login } = useAuth();
+    const mutation = useMutation({
+        mutationFn: async (data: FormFields) =>
+            fetch(authEndpoints().login(), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            }).then(res => res.json())
+    });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
-            let response = await AccountService.login(data.login, data.password);
+            const response: NetworkResponse<LoginResponse> = await mutation.mutateAsync(data);
             if (response.success && response.data) {
                 login(response.data);
             } else {
-                console.error(response.error);
+                console.error(response.message as string);
             }
         } catch (error) {
             console.error(error);

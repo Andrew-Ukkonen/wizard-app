@@ -7,13 +7,13 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import visuallyHidden from '@mui/utils/visuallyHidden';
 import React, { useState } from 'react';
-import AccountService from '../services/AccountService'; // Adjust the import based on your service location
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { authEndpoints } from '../utils/endpoints';
 
 const schema = z.object({
     email: z.email(),
@@ -35,17 +35,16 @@ type FormFields = z.infer<typeof schema>;
 export default function SignUp() {
     const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm<FormFields>({ resolver: zodResolver(schema) });
     const [showPassword, setShowPassword] = useState(false);
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5185'; // Fallback to local URL if not set
     const mutation = useMutation({
         mutationFn: async (data: FormFields) =>
-            fetch(`${API_BASE_URL}/account/register`, {
+            fetch(authEndpoints().register(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             }).then(res => res.json())
     });
 
-    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
         try {
             const response = await mutation.mutateAsync(data);
             if (!response) {
@@ -68,7 +67,7 @@ export default function SignUp() {
 
             console.log('Registration successful:', response);
         } catch (error) {
-            console.error(error);
+            console.error(error as string);
             setError("root", { message: "Something went wrong. Please try again later." });
         }
     };
@@ -163,7 +162,7 @@ export default function SignUp() {
                                         onClick={handleClickShowPassword}
                                         onMouseDown={handleMouseDownPassword}
                                         edge="end"
-                                        color="primary"
+                                        sx={{ border: 'none !important', backgroundColor: 'transparent !important' }}
                                     >
                                         {showPassword ? <Visibility /> : <VisibilityOff />}
                                     </IconButton>
@@ -203,6 +202,7 @@ export default function SignUp() {
                                         onClick={handleClickShowPassword}
                                         onMouseDown={handleMouseDownPassword}
                                         edge="end"
+                                        sx={{ border: 'none !important', backgroundColor: 'transparent !important' }}
                                     >
                                         {showPassword ? <Visibility /> : <VisibilityOff />}
                                     </IconButton>
