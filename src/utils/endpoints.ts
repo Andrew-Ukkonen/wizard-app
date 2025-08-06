@@ -7,6 +7,7 @@ export const authEndpoints = () => {
         logout: () => `${baseURL}/auth/logout`,
         refreshToken: () => `${baseURL}/auth/refresh-token`,
         revokeToken: () => `${baseURL}/auth/revoke-token`,
+        authorized: () => `${baseURL}/auth/authorized`,
     };
 }
 

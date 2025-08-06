@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { createContext, useState, useContext, useEffect } from "react";
 import { LoginResponse } from "../types/data/LoginResponse";
+import { jwtDecode } from 'jwt-decode';
 
 
 interface ProviderProps {
@@ -37,7 +38,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Try to refresh token on load
     useEffect(() => {
         const tryRefresh = async () => {
-            const response = await fetch('/api/auth/refresh', {
+            if (accessToken && !isTokenExpired()) {
+                return; // Token is still valid, no need to refresh
+            }
+            const response = await fetch('/auth/refresh', {
                 method: 'POST',
                 credentials: 'include',
             });
@@ -50,6 +54,21 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         tryRefresh();
     }, []);
+
+    const isTokenExpired = () => {
+        if (!accessToken) {
+            return true;
+        }
+        try {
+            const decodedToken = jwtDecode(accessToken);
+            const currentTime = Date.now() / 1000; // Current time in seconds
+
+            return decodedToken.exp && decodedToken.exp < currentTime;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return true;
+        }
+    };
 
     const login = (data: LoginResponse) => {
         setTimeout(() => {

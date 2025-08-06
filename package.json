@@ -21,6 +21,7 @@
     "@tanstack/react-router": "^1.130.2",
     "@tanstack/react-router-devtools": "^1.130.2",
     "axios": "^1.11.0",
+    "jwt-decode": "^4.0.0",
     "react": "latest",
     "react-dom": "latest",
     "react-hook-form": "^7.61.1",
