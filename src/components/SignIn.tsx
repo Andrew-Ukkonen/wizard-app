@@ -29,6 +29,7 @@ export default function SignIn() {
             fetch(authEndpoints().login(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // <== Required!
                 body: JSON.stringify(data),
             }).then(res => res.json())
     });

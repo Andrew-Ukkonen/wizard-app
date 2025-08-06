@@ -8,7 +8,7 @@ export const authEndpoints = () => {
         refreshToken: () => `${baseURL}/auth/refresh-token`,
         revokeToken: () => `${baseURL}/auth/revoke-token`,
         refresh: () => `${baseURL}/auth/refresh`,
-        authorized: () => `${baseURL}/auth/authorized`,
+        authenticated: () => `${baseURL}/auth/authenticated`,
     };
 }
 
@@ -17,5 +17,15 @@ export const accountEndpoints = () => {
         getAccount: () => `${baseURL}/account`,
         updateAccount: () => `${baseURL}/account`,
         deleteAccount: () => `${baseURL}/account`,
+    };
+}
+
+export const authRequestBuilder = (token: string | null) => {
+    return {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        credentials: 'include' as RequestCredentials,
     };
 }
