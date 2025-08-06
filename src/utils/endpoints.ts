@@ -1,4 +1,4 @@
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5175'; // Fallback to local URL if not set
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5175';
 
 export const authEndpoints = () => {
     return {
@@ -7,6 +7,8 @@ export const authEndpoints = () => {
         logout: () => `${baseURL}/auth/logout`,
         refreshToken: () => `${baseURL}/auth/refresh-token`,
         revokeToken: () => `${baseURL}/auth/revoke-token`,
+        refresh: () => `${baseURL}/auth/refresh`,
+        authorized: () => `${baseURL}/auth/authorized`,
     };
 }
 

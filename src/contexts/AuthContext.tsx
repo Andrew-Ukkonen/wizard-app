@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { createContext, useState, useContext, useEffect } from "react";
 import { LoginResponse } from "../types/data/LoginResponse";
+import { authEndpoints } from "../utils/endpoints";
 
 
 interface ProviderProps {
@@ -37,7 +38,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Try to refresh token on load
     useEffect(() => {
         const tryRefresh = async () => {
-            const response = await fetch('/auth/refresh', {
+            const response = await fetch(authEndpoints().refresh(), {
                 method: 'POST',
                 credentials: 'include',
             });
