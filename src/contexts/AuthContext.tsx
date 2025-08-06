@@ -2,22 +2,19 @@ import { useNavigate } from "@tanstack/react-router";
 import { createContext, useState, useContext, useEffect } from "react";
 import { LoginResponse } from "../types/data/LoginResponse";
 import { authEndpoints } from "../utils/endpoints";
+import { fetchWithAuth, setAccessToken } from "../utils/auth";
 
 
 interface ProviderProps {
     user: string | null,
-    accessToken: string | null,
     login(data: LoginResponse): void,
     logout(): void,
-    setAccessToken(token: string | null): void;
 }
 
 const AuthContext = createContext<ProviderProps>({
     user: null,
-    accessToken: null,
     login: () => { },
     logout: () => { },
-    setAccessToken: (_token: string | null) => { }
 })
 
 export const randomAlphaNumeric = (length: number) => {
@@ -31,45 +28,36 @@ export const randomAlphaNumeric = (length: number) => {
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const storedInfo = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null
-    const [user, setUser] = useState<string | null>(storedInfo?.email)
-    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [user, setUser] = useState<string | null>(storedInfo?.username)
     const navigate = useNavigate();
 
-    // Try to refresh token on load
     useEffect(() => {
-        const tryRefresh = async () => {
-            const response = await fetch(authEndpoints().refresh(), {
-                method: 'POST',
-                credentials: 'include',
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setAccessToken(data.accessToken);
-            }
-        };
-
-        tryRefresh();
+        if (!user) {
+            navigate({ to: '/login' })
+        }
     }, []);
 
     const login = (data: LoginResponse) => {
         setTimeout(() => {
             setUser(data.userWrapper.data!.username)
-            setAccessToken(data.tokens.accessToken)
+            setAccessToken(data.accessToken)
             localStorage.setItem('user', JSON.stringify(data.userWrapper.data))
             navigate({ to: '/spellbook' })
         }, 1000);
     }
 
-    const logout = () => {
-        setUser(null)
-        setAccessToken(null)
-        localStorage.removeItem('user')
-        navigate({ to: '/login' })
+    const logout = async () => {
+        await fetchWithAuth(authEndpoints().logout(), {
+            method: 'POST',
+        });
+        setAccessToken(null);
+        setUser(null);
+        localStorage.removeItem('user');
+        navigate({ to: '/login' });
     }
 
     return (
-        <AuthContext.Provider value={{ user, accessToken, login, logout, setAccessToken }}>
+        <AuthContext.Provider value={{ user, login, logout }}>
             {children}
         </AuthContext.Provider>
     )
