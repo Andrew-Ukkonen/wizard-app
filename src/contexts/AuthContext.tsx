@@ -37,7 +37,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Try to refresh token on load
     useEffect(() => {
         const tryRefresh = async () => {
-            const response = await fetch('/api/auth/refresh', {
+            const response = await fetch('/auth/refresh', {
                 method: 'POST',
                 credentials: 'include',
             });
