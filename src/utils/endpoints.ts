@@ -1,4 +1,4 @@
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5175';
+const baseURL = (import.meta.env.VITE_API_URL || 'http://localhost:5175') + '/api';
 
 export const authEndpoints = () => {
     return {
