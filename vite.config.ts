@@ -4,7 +4,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
 export default defineConfig({
   preview: {
-    allowedHosts: ['wizard-idler.com'],
+    allowedHosts: ['wizard-idler.com', 'www.wizard-idler.com'],
   },
   plugins: [
     // Please make sure that '@tanstack/router-plugin' is passed before '@vitejs/plugin-react'
