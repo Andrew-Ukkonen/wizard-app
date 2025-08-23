@@ -12,8 +12,8 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { authEndpoints } from '../utils/endpoints';
+import { AUTH_ENDPOINTS } from '../utils/endpoints';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const schema = z.object({
     email: z.email(),
@@ -35,18 +35,28 @@ type FormFields = z.infer<typeof schema>;
 export default function SignUp() {
     const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm<FormFields>({ resolver: zodResolver(schema) });
     const [showPassword, setShowPassword] = useState(false);
-    const mutation = useMutation({
-        mutationFn: async (data: FormFields) =>
-            fetch(authEndpoints().register(), {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const signUpRequest = async (data: FormFields) => {
+        setIsLoading(true);
+        try {
+            const response = await fetch(AUTH_ENDPOINTS.REGISTER, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
-            }).then(res => res.json())
-    });
+            });
+            const result = await response.json();
+            setIsLoading(false);
+            return result;
+        } catch (error) {
+            setIsLoading(false);
+            throw error;
+        }
+    };
 
     const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
         try {
-            const response = await mutation.mutateAsync(data);
+            const response = await signUpRequest(data);
             if (!response) {
                 setError("root", { message: "Something went wrong. Please try again later." });
                 return;
@@ -89,6 +99,11 @@ export default function SignUp() {
                 useFlexGap
                 sx={{ pt: 2, width: { xs: '100%', sm: '350px' } }}
             >
+                {isLoading && (
+                    <Stack alignItems="center" sx={{ py: 2 }}>
+                        <CircularProgress size={32} />
+                    </Stack>
+                )}
                 <InputLabel htmlFor="email" sx={visuallyHidden}>
                     Email
                 </InputLabel>

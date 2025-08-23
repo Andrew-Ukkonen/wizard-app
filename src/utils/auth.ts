@@ -1,14 +1,19 @@
-import { authEndpoints } from "./endpoints";
+import { AUTH_ENDPOINTS } from "./endpoints";
 
 let accessToken: string | null = null;
 
 export const setAccessToken = (token: string | null) => {
   accessToken = token;
+  console.log("Access token set:", token);
+  if (typeof token === "string") {
+    localStorage.setItem('accessToken', token);
+  }
 };
 
 const refreshToken = async (): Promise<boolean> => {
+  console.log("Refreshing access token...");
   try {
-    const res = await fetch(authEndpoints().refresh(), {
+    const res = await fetch(AUTH_ENDPOINTS.REFRESH, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -25,6 +30,7 @@ const refreshToken = async (): Promise<boolean> => {
 };
 
 export const fetchWithAuth = async (input: RequestInfo, init: RequestInit = {}) => {
+  console.log("Fetching with auth...", input);
   const headers = new Headers(init.headers || {});
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);

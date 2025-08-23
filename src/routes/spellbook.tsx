@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { useMutation } from '@tanstack/react-query';
-import { authEndpoints } from '../utils/endpoints';
+import { AUTH_ENDPOINTS } from '../utils/endpoints';
 import { fetchWithAuth } from '../utils/auth';
+import { Stack, CircularProgress } from '@mui/material';
 
 
 export const Route = createFileRoute('/spellbook')({
@@ -13,22 +13,28 @@ function RouteComponent() {
   const [authorized, setAuthorized] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const mutation = useMutation({
-    mutationFn: async () =>
-      fetchWithAuth(authEndpoints().authenticated(), {
+  const authorize = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetchWithAuth(AUTH_ENDPOINTS.AUTHENTICATED, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', }
-      } as RequestInit).then(res => res.text())
-  });
+      } as RequestInit);
+      return await response.text();
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response: string = await mutation.mutateAsync();
+        const response: string = await authorize();
         if (response) {
           setAuthorized(response);
         } else {
-          console.error(response);
+          throw new Error(response);
         }
       } catch (error) {
         console.error(error);
@@ -41,11 +47,19 @@ function RouteComponent() {
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      isLoading && (
+        <Stack alignItems="center" sx={{ py: 2 }}>
+          <CircularProgress size={32} />
+        </Stack>
+      )
+    );
   }
 
-  return <>
-    <div>Welcome to the spellbook!</div>
-    {authorized}
-  </>
+  return (
+    <>
+      <div>Welcome to the spellbook!</div>
+      {authorized}
+    </>
+  );
 }
