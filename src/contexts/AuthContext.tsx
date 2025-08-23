@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { createContext, useState, useContext, useEffect } from "react";
 import { LoginResponse } from "../types/data/LoginResponse";
-import { authEndpoints } from "../utils/endpoints";
+import { AUTH_ENDPOINTS } from "../utils/endpoints";
 import { fetchWithAuth, setAccessToken } from "../utils/auth";
 
 
@@ -38,16 +38,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const login = (data: LoginResponse) => {
-        setTimeout(() => {
-            setUser(data.userWrapper.data!.username)
-            setAccessToken(data.accessToken)
-            localStorage.setItem('user', JSON.stringify(data.userWrapper.data))
-            navigate({ to: '/spellbook' })
-        }, 1000);
+        setUser(data.userWrapper.data!.username)
+        setAccessToken(data.accessToken)
+        localStorage.setItem('user', JSON.stringify(data.userWrapper.data))
+        navigate({ to: '/spellbook' })
     }
 
     const logout = async () => {
-        await fetchWithAuth(authEndpoints().logout(), {
+        await fetchWithAuth(AUTH_ENDPOINTS.LOGOUT, {
             method: 'POST',
         });
         setAccessToken(null);

@@ -1,4 +1,4 @@
-import { IconButton, InputAdornment } from '@mui/material';
+import { CircularProgress, IconButton, InputAdornment } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
@@ -8,11 +8,10 @@ import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useMutation } from '@tanstack/react-query';
 import { LoginResponse } from '../types/data/LoginResponse';
 import { NetworkResponse } from '../types/data/NetworkResponse';
 import { useAuth } from '../contexts/AuthContext';
-import { authEndpoints } from '../utils/endpoints';
+import { AUTH_ENDPOINTS } from '../utils/endpoints';
 
 
 type FormFields = {
@@ -23,20 +22,28 @@ type FormFields = {
 export default function SignIn() {
     const { register, handleSubmit, formState: { isSubmitting } } = useForm<FormFields>();
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
-    const mutation = useMutation({
-        mutationFn: async (data: FormFields) =>
-            fetch(authEndpoints().login(), {
+
+    const signInRequest = async (data: FormFields) => {
+        setIsLoading(true);
+
+        try {
+            const res = await fetch(AUTH_ENDPOINTS.LOGIN, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include', // <== Required!
+                credentials: 'include',
                 body: JSON.stringify(data),
-            }).then(res => res.json())
-    });
+            });
+            return await res.json();
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
-            const response: NetworkResponse<LoginResponse> = await mutation.mutateAsync(data);
+            const response: NetworkResponse<LoginResponse> = await signInRequest(data);
             if (response.success && response.data) {
                 login(response.data);
             } else {
@@ -63,6 +70,11 @@ export default function SignIn() {
                 useFlexGap
                 sx={{ pt: 2, width: { xs: '100%', sm: '350px' } }}
             >
+                {isLoading && (
+                    <Stack alignItems="center" sx={{ py: 2 }}>
+                        <CircularProgress size={32} />
+                    </Stack>
+                )}
                 <InputLabel htmlFor="username" sx={visuallyHidden}>
                     Email / Username
                 </InputLabel>
